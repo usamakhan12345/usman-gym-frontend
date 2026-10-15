@@ -1,0 +1,56 @@
+@use 'tokens' as *;
+
+@mixin up($bp) {
+  @if $bp == sm {
+    @media (min-width: $bp-sm) { @content; }
+  } @else if $bp == md {
+    @media (min-width: $bp-md) { @content; }
+  } @else if $bp == lg {
+    @media (min-width: $bp-lg) { @content; }
+  } @else if $bp == xl {
+    @media (min-width: $bp-xl) { @content; }
+  }
+}
+
+@mixin down($bp) {
+  @if $bp == md {
+    @media (max-width: #{$bp-md - 1px}) { @content; }
+  } @else if $bp == lg {
+    @media (max-width: #{$bp-lg - 1px}) { @content; }
+  } @else if $bp == sm {
+    @media (max-width: #{$bp-sm - 1px}) { @content; }
+  }
+}
+
+@mixin container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--space-4);
+
+  @include up(md) { padding-inline: var(--space-6); }
+}
+
+@mixin focus-ring($color: var(--yellow-500)) {
+  outline: 3px solid $color;
+  outline-offset: 2px;
+}
+
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin line-clamp($n) {
+  display: -webkit-box;
+  -webkit-line-clamp: $n;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

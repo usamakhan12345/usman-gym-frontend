@@ -1,0 +1,141 @@
+@use '../mixins' as *;
+
+// ---------------------------------------------------------------------------
+// Small-device refinements (phones from 320px up). Loaded last so it can tune earlier rules.
+// ---------------------------------------------------------------------------
+
+// Never let a single wide child create sideways page scroll.
+html, body { max-width: 100%; overflow-x: clip; }
+
+// Grid children may shrink below their content width (long buttons / words used to stretch the page).
+.plans, .cards-grid, .trainers, .testimonials, .benefits, .stat-grid, .contact-grid, .split, .form-row, .mv-grid {
+  > * { min-width: 0; }
+}
+.plans, .cards-grid, .trainers, .testimonials, .benefits, .contact-grid, .split, .mv-grid { grid-template-columns: minmax(0, 1fr); }
+@include up(sm) { .benefits, .trainers { grid-template-columns: repeat(2, minmax(0, 1fr)); } .mv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@include up(md) { .cards-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .plans, .testimonials { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@include up(lg) { .cards-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } .benefits { grid-template-columns: repeat(4, minmax(0, 1fr)); } .trainers { grid-template-columns: repeat(4, minmax(0, 1fr)); } .contact-grid { grid-template-columns: 1fr 1.2fr; } .split { grid-template-columns: 1fr 1fr; } }
+
+// Long labels on block buttons wrap instead of overflowing.
+.btn--block { white-space: normal; text-align: center; line-height: 1.25; }
+
+// Comfortable tap targets for text links (>= 44px tall hit area) without changing how they look.
+.footer li a, .contact-info a, .auth-card__links a, .auth-card__foot a, .mobile-menu .navbar__link {
+  display: inline-flex; align-items: center; min-height: 44px;
+}
+.auth-card__links { gap: var(--space-3); flex-wrap: wrap; }
+
+// Closed off-canvas sidebar must not be reachable by keyboard / screen readers.
+.sidebar {
+  visibility: hidden;
+  transition: transform 220ms ease, visibility 0s linear 220ms;
+  &--open { visibility: visible; transition-delay: 0s; }
+  @include up(lg) { visibility: visible; transition: none; }
+  padding-bottom: calc(var(--space-5) + env(safe-area-inset-bottom, 0px));
+}
+
+// iOS/Android: use the *dynamic* viewport height so browser toolbars don't cut content.
+.shell { min-height: 100vh; min-height: 100dvh; }
+.auth-page { min-height: calc(100vh - var(--navbar-h)); min-height: calc(100dvh - var(--navbar-h)); }
+
+// ---------------------------------------------------------------- Phones
+@include down(md) {
+  .section { padding-block: var(--space-7); }
+  .section__head { margin-bottom: var(--space-6); }
+
+  // Table -> stacked cards. Cell labels come from <th> text (see useStackedTables in DashboardShell).
+  .table-wrap { overflow-x: visible; }
+  .table {
+    min-width: 0; display: block;
+    thead { @include visually-hidden; }
+    tbody { display: grid; gap: var(--space-3); padding: var(--space-3); }
+    tr { display: grid; gap: var(--space-2); padding: var(--space-3) var(--space-4); background: var(--white); border: 1px solid var(--gray-200); border-radius: var(--radius-md); }
+    tbody tr:hover { background: var(--white); }
+    td { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); padding: 0; border: 0; text-align: right; min-width: 0;
+      &::before { content: attr(data-label); flex: none; max-width: 42%; text-align: left; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--gray-500); }
+      &[data-label='']::before, &:not([data-label])::before { display: none; }
+      &.actions-cell, &:has(> .actions) { justify-content: stretch; padding-top: var(--space-2); border-top: 1px solid var(--gray-100); &::before { display: none; } }
+      > .actions { width: 100%; justify-content: stretch; .btn { flex: 1 1 0; } }
+      .member-cell { text-align: left; }
+    }
+    .num { text-align: right; }
+  }
+  .card--flush .table tbody { background: var(--gray-50); }
+
+  // Toolbars stack neatly
+  .toolbar { padding: var(--space-3); .search { flex-basis: 100%; } select { flex: 1 1 calc(50% - var(--space-2)); min-width: 0; } }
+  .pagination { justify-content: center; text-align: center; }
+  .tabs button { padding: var(--space-3); }
+
+  // Forms: stack the two-column rows, bigger buttons
+  .form-row { grid-template-columns: minmax(0, 1fr); }
+
+  // Dialogs become bottom sheets with a sticky action bar
+  .modal-backdrop { align-items: end; padding: 0; }
+  .modal { max-width: none; border-radius: var(--radius-lg) var(--radius-lg) 0 0; max-height: 94vh; max-height: 94dvh; animation: sheet 220ms ease;
+    &__head, &__body { padding-inline: var(--space-4); }
+    &__foot { position: sticky; bottom: 0; background: var(--white); padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--gray-200); .btn { flex: 1 1 0; } } }
+  .summary div { flex-wrap: wrap; gap: var(--space-1); }
+
+  .toasts { left: var(--space-3); right: var(--space-3); bottom: calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); .toast { min-width: 0; } }
+
+  .page-head { align-items: stretch; > div:last-child { width: 100%; .btn { flex: 1 1 auto; } } }
+  // Stat tiles: two per row on phones, headline tiles full width
+  .stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+  .stat { padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); }
+  .stat__label { font-size: 0.68rem; gap: var(--space-1); align-items: flex-start; svg { flex: none; width: 16px; height: 16px; } }
+  .stat__value { font-size: 1.5rem; }
+  .stat--dark { grid-column: 1 / -1; }
+  .stat .gym-id { font-size: 1.15rem; }
+  .card { padding: var(--space-4); }
+}
+@keyframes sheet { from { transform: translateY(40px); opacity: 0; } }
+
+// ---------------------------------------------------------------- Very small phones (<= 400px)
+@media (max-width: 400px) {
+  :root { --navbar-h: 64px; }
+  .container, .navbar__inner, .footer__grid { padding-inline: var(--space-4); }
+  .brand { font-size: 1.25rem; &__mark { width: 34px; height: 34px; } }
+  .hero { min-height: auto; &__inner { padding-block: var(--space-7); } &__cta .btn { flex: 1 1 100%; } &__stats strong { font-size: 1.6rem; } }
+  .page-hero { padding: var(--space-7) 0 var(--space-6); }
+  .auth-card { padding: var(--space-5) var(--space-4); h1 { font-size: 1.8rem; } }
+  .otp-input input { letter-spacing: 0.45em; font-size: 1.4rem; }
+  .fee-hero { padding: var(--space-5) var(--space-4); }
+  .shell__topbar { padding-inline: var(--space-2); }
+  .shell__content { padding-inline: var(--space-3); }
+  .about-img__badge { left: 8px; padding: var(--space-3) var(--space-4); }
+  .gym-id { font-size: 1.3rem; }
+  .plan { padding: var(--space-5) var(--space-4); }
+}
+
+// Top bar: on narrow screens only show the avatar, not the name text.
+@media (max-width: 480px) {
+  .shell__user > div { display: none; }
+  .shell__topbar > span.text-muted { display: none; }
+  .shell__topbar { justify-content: space-between; }
+}
+
+// Notch / home-indicator safe areas when installed as an app.
+@supports (padding: env(safe-area-inset-top)) {
+  .navbar, .shell__topbar { padding-top: env(safe-area-inset-top, 0); height: calc(var(--navbar-h) + env(safe-area-inset-top, 0px)); }
+  .shell__topbar { height: calc(64px + env(safe-area-inset-top, 0px)); }
+  .shell__content, .footer__bottom { padding-bottom: calc(var(--space-8) + env(safe-area-inset-bottom, 0px)); }
+  .footer__bottom { padding-bottom: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); }
+}
+
+// Standalone (installed app) tweaks: no browser chrome, so behave like an app.
+@media (display-mode: standalone) {
+  body { overscroll-behavior-y: contain; -webkit-tap-highlight-color: transparent; }
+  .skip-link { display: none; }
+}
+button, a, [role='button'] { touch-action: manipulation; }
+
+// Touch screens: every button and control gets a finger-sized hit area.
+@media (pointer: coarse) {
+  .btn { min-height: 44px; }
+  .btn--sm { min-height: 40px; padding-inline: 1rem; }
+  .field input, .field select, .toolbar select, .toolbar .search input, .viz__controls select { min-height: 46px; }
+  .seg button { min-height: 40px; }
+  .tabs button { min-height: 44px; }
+  .thumb { width: 64px; height: 64px; }
+}

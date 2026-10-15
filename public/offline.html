@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="robots" content="noindex">
+<title>Offline | Usman Gym</title>
+<!-- Self-contained on purpose: shown by the service worker when there is no network, so it cannot depend on any other file. -->
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px;background:#0a0a0b;color:#fff;text-align:center;
+       font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.6}
+  main{max-width:420px;display:grid;gap:16px;justify-items:center}
+  .brand{display:inline-flex;align-items:center;gap:10px;font:700 26px/1 "Arial Narrow",Impact,Arial,sans-serif;letter-spacing:.08em;text-transform:uppercase}
+  .brand b{color:#ffc700}
+  .mark{width:40px;height:40px}
+  h1{margin:0;font:700 34px/1.1 "Arial Narrow",Impact,Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase}
+  p{margin:0;color:#c9cdd2}
+  a.btn{display:inline-block;margin-top:8px;padding:14px 28px;border-radius:6px;background:#ffc700;color:#0a0a0b;font:700 16px/1 "Arial Narrow",Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;text-decoration:none}
+  a.btn:active{transform:translateY(1px)}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="6" fill="#ffc700"/><path d="M7 12v8M11 9v14M21 9v14M25 12v8M11 16h10" stroke="#0a0a0b" stroke-width="2.6" stroke-linecap="round" fill="none"/></svg>
+    <span>Usman <b>Gym</b></span>
+  </div>
+  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#ffc700" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h.01M8.5 16.4a5 5 0 0 1 7 0M5 12.9a10 10 0 0 1 5.2-2.8M19 12.9a10 10 0 0 0-2.2-1.6M2 8.8a15 15 0 0 1 4.2-2.7M22 8.8a15 15 0 0 0-8.3-3.7M2 2l20 20"/></svg>
+  <h1>You're offline</h1>
+  <p>Usman Gym needs an internet connection to show your latest fee status. Check your connection and try again.</p>
+  <a class="btn" href="/member/dashboard" onclick="location.reload();return false;">Try again</a>
+</main>
+</body>
+</html>

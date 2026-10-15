@@ -1,0 +1,87 @@
+@use '../mixins' as *;
+
+// ---------------------------------------------------------------- Navbar
+.navbar {
+  position: sticky; top: 0; z-index: 100; height: var(--navbar-h);
+  border-bottom: 1px solid var(--ink-700); color: var(--white);
+  isolation: isolate;
+
+  // The blurred background lives on a pseudo-element. A backdrop-filter on the navbar itself would make it the
+  // containing block for position:fixed children, trapping the full-screen mobile menu inside the 64px bar.
+  &::before { content: ''; position: absolute; inset: 0; z-index: -1; background: rgb(10 10 11 / 92%); backdrop-filter: blur(10px); }
+
+  &__inner { @include container; height: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+  &__links { display: none; align-items: center; gap: var(--space-1); @include up(lg) { display: flex; } }
+  &__link { padding: 0.5rem 0.8rem; font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-300); border-radius: var(--radius-sm); transition: color var(--transition);
+    &:hover, &--active { color: var(--yellow-500); } }
+  &__cta { display: none; align-items: center; gap: var(--space-3); @include up(lg) { display: flex; } }
+  &__toggle { background: none; border: 0; color: var(--white); padding: var(--space-2); display: grid; place-items: center; min-width: 44px; min-height: 44px; @include up(lg) { display: none; } }
+}
+
+.mobile-menu {
+  position: fixed; inset: var(--navbar-h) 0 0 0; z-index: 99; background: var(--black); padding: var(--space-5) var(--space-4); overflow-y: auto;
+  display: grid; align-content: start; gap: var(--space-1); animation: fade 140ms ease;
+  .navbar__link { font-size: 1.4rem; padding: var(--space-3) var(--space-2); border-bottom: 1px solid var(--ink-700); border-radius: 0; }
+  &__cta { display: grid; gap: var(--space-3); margin-top: var(--space-5); }
+  @include up(lg) { display: none; }
+}
+
+.brand { display: inline-flex; align-items: center; gap: var(--space-2); font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--white);
+  &__mark { display: grid; place-items: center; width: 38px; height: 38px; background: var(--yellow-500); color: var(--black); border-radius: var(--radius-sm); transform: skewX(-8deg); }
+  span.accent { color: var(--yellow-500); } }
+
+// ---------------------------------------------------------------- Footer
+.footer { background: var(--black); color: var(--gray-300); padding-top: var(--space-8); border-top: 4px solid var(--yellow-500);
+  &__grid { @include container; display: grid; gap: var(--space-6); padding-bottom: var(--space-7); @include up(md) { grid-template-columns: 1.6fr 1fr 1.4fr 1fr; } }
+  h4 { color: var(--white); font-size: 1.05rem; letter-spacing: 0.1em; margin-bottom: var(--space-4); }
+  ul { display: grid; gap: var(--space-2); }
+  a:hover { color: var(--yellow-500); }
+  li { display: flex; gap: var(--space-2); align-items: flex-start; svg { flex: none; margin-top: 4px; color: var(--yellow-500); } }
+  &__social { display: flex; gap: var(--space-2); margin-top: var(--space-4);
+    a { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--ink-600); border-radius: 50%; transition: all var(--transition); &:hover { background: var(--yellow-500); color: var(--black); border-color: var(--yellow-500); } } }
+  &__bottom { border-top: 1px solid var(--ink-700); padding: var(--space-4); text-align: center; font-size: 0.85rem; color: var(--gray-500); }
+}
+
+// ---------------------------------------------------------------- Auth screens
+.auth-page { min-height: calc(100vh - var(--navbar-h)); display: grid; place-items: center; padding: var(--space-6) var(--space-4);
+  background: linear-gradient(135deg, rgb(10 10 11 / 94%), rgb(10 10 11 / 82%)), var(--auth-bg, none) center / cover, var(--black); }
+.auth-card { width: 100%; max-width: 480px; background: var(--white); border-radius: var(--radius-lg); padding: var(--space-6) var(--space-5); box-shadow: var(--shadow-lg); border-top: 6px solid var(--yellow-500); @include up(sm) { padding: var(--space-7) var(--space-6); }
+  h1 { font-size: 2.1rem; margin-bottom: var(--space-2); }
+  &__sub { color: var(--gray-500); margin-bottom: var(--space-5); }
+  &__foot { margin-top: var(--space-5); text-align: center; font-size: 0.92rem; color: var(--gray-500); a { color: var(--ink-900); font-weight: 700; border-bottom: 2px solid var(--yellow-500); } }
+  &__links { display: flex; justify-content: space-between; font-size: 0.88rem; a { font-weight: 600; border-bottom: 1px solid var(--gray-300); &:hover { border-color: var(--yellow-600); } } } }
+.otp-input input { letter-spacing: 0.7em; text-align: center; font-size: 1.6rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+// ---------------------------------------------------------------- Dashboard shell
+.shell { display: grid; min-height: 100vh; background: var(--gray-100); @include up(lg) { grid-template-columns: var(--sidebar-w) 1fr; }
+  &__main { min-width: 0; display: flex; flex-direction: column; }
+  &__topbar { position: sticky; top: 0; z-index: 50; height: 64px; background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; justify-content: space-between; padding-inline: var(--space-4); gap: var(--space-3); @include up(lg) { padding-inline: var(--space-6); } }
+  &__menu-btn { background: none; border: 0; min-width: 44px; min-height: 44px; display: grid; place-items: center; @include up(lg) { display: none; } }
+  &__content { padding: var(--space-5) var(--space-4) var(--space-8); width: 100%; max-width: 1280px; margin-inline: auto; display: grid; gap: var(--space-5); align-content: start; @include up(lg) { padding-inline: var(--space-6); } }
+  &__user { display: flex; align-items: center; gap: var(--space-3); font-size: 0.9rem; strong { display: block; line-height: 1.2; } small { color: var(--gray-500); } .avatar { --size: 38px; } }
+}
+.page-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: var(--space-3);
+  h1 { font-size: clamp(1.7rem, 4vw, 2.3rem); margin: 0; } p { margin: var(--space-1) 0 0; color: var(--gray-500); } }
+
+.sidebar { background: var(--black); color: var(--gray-300); display: flex; flex-direction: column; padding: var(--space-5) var(--space-3);
+  position: fixed; inset: 0 auto 0 0; width: var(--sidebar-w); z-index: 150; transform: translateX(-100%); transition: transform 220ms ease; overflow-y: auto;
+  &--open { transform: none; }
+  @include up(lg) { position: sticky; top: 0; height: 100vh; transform: none; }
+  &__brand { padding: 0 var(--space-3) var(--space-5); display: flex; align-items: center; justify-content: space-between; }
+  &__close { background: none; border: 0; color: var(--white); @include up(lg) { display: none; } }
+  &__group { font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--gray-500); padding: var(--space-4) var(--space-3) var(--space-2); }
+  &__link { display: flex; align-items: center; gap: var(--space-3); padding: 0.7rem var(--space-3); border-radius: var(--radius-sm); font-weight: 500; transition: all var(--transition); min-height: 44px;
+    &:hover { background: var(--ink-800); color: var(--white); }
+    &--active { background: var(--yellow-500); color: var(--black); font-weight: 700; &:hover { background: var(--yellow-500); color: var(--black); } } }
+  &__foot { margin-top: auto; padding-top: var(--space-5); border-top: 1px solid var(--ink-700); display: grid; gap: var(--space-2); }
+}
+.sidebar-scrim { position: fixed; inset: 0; background: rgb(0 0 0 / 55%); z-index: 140; @include up(lg) { display: none; } }
+
+.fee-hero { background: var(--black); color: var(--white); border-radius: var(--radius-lg); padding: var(--space-6); position: relative; overflow: hidden; display: grid; gap: var(--space-4);
+  &::after { content: ''; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; background: var(--yellow-500); opacity: 0.16; transform: rotate(35deg); }
+  &__month { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.1em; color: var(--yellow-500); }
+  &__amount { font-family: var(--font-display); font-size: clamp(2.2rem, 6vw, 3.4rem); font-weight: 700; line-height: 1; }
+  &__row { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
+  .badge { font-size: 0.9rem; padding: 0.35rem 1rem; } }
+
+.gym-id { display: inline-block; font-family: var(--font-display); font-size: 1.6rem; letter-spacing: 0.08em; background: var(--yellow-500); color: var(--black); padding: 0.15rem 0.9rem; border-radius: var(--radius-sm); transform: skewX(-6deg); font-weight: 700; }
