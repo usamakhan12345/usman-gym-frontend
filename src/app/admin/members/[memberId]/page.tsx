@@ -2,11 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ArrowLeft, Mail, Pencil, Phone, Undo2, Wallet } from 'lucide-react';
+import { ArrowLeft, Mail, Pencil, Phone, Trash2, Undo2, Wallet } from 'lucide-react';
 import { z } from 'zod';
+import { DeleteMemberModal } from '@/components/admin/DeleteMemberModal';
+import { EditMemberModal } from '@/components/admin/EditMemberModal';
 import { CorrectPaymentModal, MarkPaidModal, type FeeTarget } from '@/components/admin/PaymentModals';
 import { Alert, Avatar, Button, Empty, ErrorState, Modal, PageLoader, SelectField, StatusBadge, TextField } from '@/components/ui';
 import { useToast } from '@/context/ToastContext';
@@ -15,69 +17,6 @@ import { fmtDate, methodLabel, money, monthLabel } from '@/lib/format';
 import { useFetch } from '@/lib/hooks';
 import { moneyField, phoneField } from '@/lib/schemas';
 import type { Fee, MemberDetail, Payment, Plan } from '@/lib/types';
-
-const editSchema = z.object({
-  fullName: z.string().trim().min(2, 'Enter the full name'),
-  phone: phoneField,
-  email: z.string().trim().refine((v) => v === '' || z.string().email().safeParse(v).success, 'Enter a valid email address'),
-  monthlyFee: moneyField,
-  applyToCurrentPending: z.boolean(),
-  planId: z.string(),
-  status: z.enum(['ACTIVE', 'INACTIVE', 'TERMINATED']),
-});
-type EditForm = z.infer<typeof editSchema>;
-
-function EditModal({ member, plans, onClose, onDone }: { member: MemberDetail; plans: Plan[]; onClose: () => void; onDone: () => void }) {
-  const { toast } = useToast();
-  const [error, setError] = useState<string | null>(null);
-  const { register, handleSubmit, watch, setError: setFieldError, formState: { errors, isSubmitting } } = useForm<EditForm>({
-    resolver: zodResolver(editSchema),
-    defaultValues: { fullName: member.fullName, phone: member.phone, email: member.email ?? '', monthlyFee: String(Number(member.monthlyFee)), applyToCurrentPending: false, planId: member.plan?.id ?? '', status: member.status },
-  });
-  const feeChanged = Number(watch('monthlyFee')) !== Number(member.monthlyFee);
-
-  const onSubmit = handleSubmit(async (v) => {
-    setError(null);
-    try {
-      await api.patch(`/admin/members/${member.id}`, {
-        fullName: v.fullName, phone: v.phone, email: v.email === '' ? null : v.email,
-        planId: v.planId || null, status: v.status,
-        ...(feeChanged ? { monthlyFee: v.monthlyFee, applyToCurrentPending: v.applyToCurrentPending } : {}),
-      });
-      toast('Member updated', 'success');
-      onDone();
-    } catch (e) {
-      if (!applyFieldErrors(e, setFieldError)) setError(errorMessage(e));
-    }
-  });
-
-  return (
-    <Modal title={`Edit ${member.gymId}`} onClose={onClose} busy={isSubmitting}
-      footer={<><Button variant="ghost" onClick={onClose} disabled={isSubmitting}>Cancel</Button><Button type="submit" form="edit-form" loading={isSubmitting}>Save changes</Button></>}>
-      <form id="edit-form" className="form" onSubmit={onSubmit} noValidate>
-        {error && <Alert kind="error">{error}</Alert>}
-        <TextField label="Full name" required error={errors.fullName?.message} {...register('fullName')} />
-        <div className="form-row">
-          <TextField label="Phone" type="tel" required error={errors.phone?.message} {...register('phone')} />
-          <TextField label="Email" type="email" error={errors.email?.message} {...register('email')} />
-        </div>
-        <div className="form-row">
-          <SelectField label="Plan" {...register('planId')}><option value="">No plan</option>{plans.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}</SelectField>
-          <SelectField label="Membership status" {...register('status')} disabled={member.status === 'TERMINATED'}>
-            <option value="ACTIVE">Active</option><option value="INACTIVE">Inactive</option><option value="TERMINATED">Terminated</option>
-          </SelectField>
-        </div>
-        <TextField label="Monthly fee (Rs.)" inputMode="decimal" required error={errors.monthlyFee?.message} {...register('monthlyFee')} />
-        {feeChanged && (
-          <>
-            <Alert kind="info">The new fee applies to months generated <strong>from now on</strong>. Past and paid months keep the amount they were billed at.</Alert>
-            <label className="check"><input type="checkbox" {...register('applyToCurrentPending')} /> Also re-price this month if it is still unpaid</label>
-          </>
-        )}
-      </form>
-    </Modal>
-  );
-}
 
 export default function MemberDetailPage() {
   const { memberId } = useParams<{ memberId: string }>();
@@ -90,6 +29,8 @@ export default function MemberDetailPage() {
   const [paying, setPaying] = useState<FeeTarget | null>(null);
   const [correcting, setCorrecting] = useState<FeeTarget | null>(null);
   const [editing, setEditing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const router = useRouter();
   const [inviting, setInviting] = useState(false);
 
   const refreshAll = () => { setPaying(null); setCorrecting(null); setEditing(false); void member.reload(); void fees.reload(); void payments.reload(); };
@@ -131,6 +72,7 @@ export default function MemberDetailPage() {
         <div style={{ display: 'flex', gap: 'var(--space-2)', flexWrap: 'wrap' }}>
           {m.accountStatus === 'INVITED' && <Button variant="outline-dark" size="sm" loading={inviting} onClick={resendInvite}>Resend invite</Button>}
           <Button variant="dark" size="sm" onClick={() => setEditing(true)}><Pencil size={14} /> Edit</Button>
+          <Button variant="danger" size="sm" onClick={() => setDeleting(true)}><Trash2 size={14} /> Delete</Button>
         </div>
       </div>
 
@@ -200,7 +142,8 @@ export default function MemberDetailPage() {
 
       {paying && <MarkPaidModal fee={paying} onClose={() => setPaying(null)} onDone={refreshAll} />}
       {correcting && <CorrectPaymentModal fee={correcting} onClose={() => setCorrecting(null)} onDone={refreshAll} />}
-      {editing && <EditModal member={m} plans={(plans.data ?? []).filter((p) => p.isActive || p.id === m.plan?.id)} onClose={() => setEditing(false)} onDone={refreshAll} />}
+      {deleting && <DeleteMemberModal member={{ id: m.id, gymId: m.gymId, fullName: m.fullName, status: m.status }} onClose={() => setDeleting(false)} onDone={() => router.replace('/admin/manage-members')} />}
+      {editing && <EditMemberModal member={m} plans={(plans.data ?? []).filter((p) => p.isActive || p.id === m.plan?.id)} onClose={() => setEditing(false)} onDone={refreshAll} />}
     </>
   );
 }

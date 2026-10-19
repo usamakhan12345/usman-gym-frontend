@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Eye, Search, UserPlus, Wallet } from 'lucide-react';
 import { PendingSignups } from '@/components/admin/PendingSignups';
 import { MarkPaidModal, type FeeTarget } from '@/components/admin/PaymentModals';
-import { Avatar, Button, Empty, ErrorState, PageHead, Pagination, PageLoader, StatusBadge } from '@/components/ui';
+import { Avatar, Button, Empty, ErrorState, PageHead, Pagination, PageLoader, StatusBadge, TableSkeleton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { fmtDate, money } from '@/lib/format';
 import { useDebounced, useFetch } from '@/lib/hooks';
@@ -50,7 +50,7 @@ export default function AdminMembers() {
           </select>
         </div>
 
-        {loading && !data ? <PageLoader /> : error || !data ? <ErrorState message={error ?? 'Unknown error'} onRetry={reload} /> : data.items.length === 0 ? (
+        {loading && !data ? <TableSkeleton /> : error || !data ? <ErrorState message={error ?? 'Unknown error'} onRetry={reload} /> : data.items.length === 0 ? (
           <Empty title={q || feeStatus || status ? 'No members match your search' : 'No members yet'}>
             {q || feeStatus || status ? 'Try a different Gym ID, name or phone number.' : 'Add your first member to start tracking monthly fees.'}
           </Empty>

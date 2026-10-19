@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Search, Undo2, Wallet } from 'lucide-react';
 import { CorrectPaymentModal, MarkPaidModal, type FeeTarget } from '@/components/admin/PaymentModals';
-import { Button, Empty, ErrorState, PageHead, Pagination, PageLoader, StatusBadge } from '@/components/ui';
+import { Button, Empty, ErrorState, PageHead, Pagination, PageLoader, StatusBadge, TableSkeleton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { fmtDate, methodLabel, money } from '@/lib/format';
 import { useDebounced, useFetch } from '@/lib/hooks';
@@ -48,7 +48,7 @@ export default function AdminFees() {
             <input type="search" placeholder="Search Gym ID, name or phone..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} aria-label="Search fees by member" />
           </div>
         </div>
-        {loading && !data ? <PageLoader /> : error || !data ? <ErrorState message={error ?? 'Unknown error'} onRetry={reload} /> : data.items.length === 0 ? (
+        {loading && !data ? <TableSkeleton /> : error || !data ? <ErrorState message={error ?? 'Unknown error'} onRetry={reload} /> : data.items.length === 0 ? (
           <Empty title="No fee records found">{status === 'PENDING' ? 'Nothing is pending right now.' : 'Try another filter or search.'}</Empty>
         ) : (
           <>

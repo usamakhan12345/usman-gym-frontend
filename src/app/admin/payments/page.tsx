@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Search } from 'lucide-react';
-import { Empty, ErrorState, PageHead, Pagination, PageLoader, StatusBadge } from '@/components/ui';
+import { Empty, ErrorState, PageHead, Pagination, PageLoader, StatusBadge, TableSkeleton } from '@/components/ui';
 import { api } from '@/lib/api';
 import { fmtDate, methodLabel, money, monthLabel } from '@/lib/format';
 import { useDebounced, useFetch } from '@/lib/hooks';
@@ -25,7 +25,7 @@ export default function AdminPayments() {
             <input type="search" placeholder="Search Gym ID, name or phone..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} aria-label="Search payments by member" />
           </div>
         </div>
-        {loading && !data ? <PageLoader /> : error || !data ? <ErrorState message={error ?? 'Unknown error'} onRetry={reload} /> : data.items.length === 0 ? <Empty title="No payments found" /> : (
+        {loading && !data ? <TableSkeleton /> : error || !data ? <ErrorState message={error ?? 'Unknown error'} onRetry={reload} /> : data.items.length === 0 ? <Empty title="No payments found" /> : (
           <>
             <div className="table-wrap">
               <table className="table">

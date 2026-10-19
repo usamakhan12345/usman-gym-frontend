@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import Link from 'next/link';
-import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Info, Inbox, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Dumbbell, Info, Inbox, X } from 'lucide-react';
 import type { Meta } from '@/lib/types';
 import { initials } from '@/lib/format';
 
@@ -95,7 +95,30 @@ export function Alert({ kind = 'info', children }: { kind?: 'error' | 'success' 
 }
 
 export const Spinner = ({ large }: { large?: boolean }) => <span className={`spinner${large ? ' spinner--lg' : ''}`} role="status" aria-label="Loading" />;
-export const PageLoader = () => <div className="page-loader"><Spinner large /></div>;
+export const PageLoader = ({ label = 'Loading...' }: { label?: string }) => (
+  <div className="page-loader" role="status" aria-live="polite">
+    <Spinner large />
+    <span>{label}</span>
+  </div>
+);
+
+/** Branded full-screen loader for app start-up (session check) and route changes. */
+export const FullPageLoader = ({ label = 'Loading' }: { label?: string }) => (
+  <div className="splash" role="status" aria-live="polite" aria-label={label}>
+    <div className="splash__mark"><Dumbbell size={38} strokeWidth={2.6} /></div>
+    <div className="splash__bar" aria-hidden />
+    <div className="splash__text">{label}...</div>
+  </div>
+);
+
+/** Placeholder rows shown while a table loads, so the page keeps its shape. */
+export function TableSkeleton({ rows = 6 }: { rows?: number }) {
+  return (
+    <div style={{ padding: 'var(--space-4)', display: 'grid', gap: 'var(--space-3)' }} role="status" aria-label="Loading">
+      {Array.from({ length: rows }, (_, i) => (<div key={i} className="skeleton" style={{ height: 44, opacity: 1 - i * 0.12 }} />))}
+    </div>
+  );
+}
 
 export function Empty({ title, children, icon }: { title: string; children?: ReactNode; icon?: ReactNode }) {
   return (

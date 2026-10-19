@@ -59,6 +59,17 @@ table { border-collapse: collapse; width: 100%; }
   }
 }
 
+// Reduced motion: switch off decorative / one-off motion, but never make looping loaders spin faster.
+// (Forcing a 0.01ms duration on an infinite animation makes a spinner flicker at a blur.)
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important; // one-off entrance animations finish instantly
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  // Loaders must keep showing that work is in progress, so they keep looping, slowly and calmly.
+  .spinner { animation: spin 3s linear infinite !important; }
+  .splash__bar::after { animation: slide 3s ease-in-out infinite !important; }
+  .splash__mark, .skeleton { animation: none !important; }
 }

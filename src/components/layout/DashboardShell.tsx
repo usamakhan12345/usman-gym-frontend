@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { LogOut, Menu, X } from 'lucide-react';
 import { homeFor, useAuth } from '@/context/AuthContext';
-import { Avatar, PageLoader } from '@/components/ui';
+import { Avatar, FullPageLoader } from '@/components/ui';
 import { InstallApp } from '@/components/pwa/InstallApp';
 import type { Role } from '@/lib/types';
 import { Brand } from './shared';
@@ -54,7 +54,7 @@ export function DashboardShell({ role, nav, children }: { role: Role; nav: NavIt
 
   useEffect(() => setOpen(false), [pathname]);
 
-  if (loading || !user || user.role !== role) return <div style={{ minHeight: '100vh', display: 'grid' }}><PageLoader /></div>;
+  if (loading || !user || user.role !== role) return <FullPageLoader label={loading ? 'Loading' : 'Redirecting'} />;
 
   // The most specific matching nav entry wins (so /admin/members/new does not also highlight /admin/members).
   const best = nav

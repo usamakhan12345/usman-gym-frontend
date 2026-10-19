@@ -72,4 +72,11 @@ $bp-xl: 1280px;
   --sidebar-w: 260px;
 
   --transition: 180ms ease;
+
+  // Loading animation speeds (seconds per cycle). Bigger number = slower and calmer.
+  --spin-speed: 1.6s;        // small spinner (inside buttons)
+  --spin-speed-lg: 2.6s;     // big page loader
+  --pulse-speed: 2.4s;       // logo pulse on the splash screen
+  --bar-speed: 2s;           // progress bar on the splash screen
+  --shimmer-speed: 2s;       // table placeholder rows
 }

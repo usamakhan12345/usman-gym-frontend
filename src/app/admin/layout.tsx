@@ -1,6 +1,6 @@
 'use client';
 
-import { CreditCard, Globe, History, ImageUp, LayoutDashboard, Settings, Tag, UserPlus, Users } from 'lucide-react';
+import { CreditCard, Globe, History, ImageUp, LayoutDashboard, Settings, Tag, UserCog, UserPlus, Users } from 'lucide-react';
 import { DashboardShell, type NavItem } from '@/components/layout/DashboardShell';
 import { useAuth } from '@/context/AuthContext';
 import { api } from '@/lib/api';
@@ -19,6 +19,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { href: '/admin/dashboard', label: 'Overview', icon: <LayoutDashboard size={18} /> },
     { href: '/admin/members', label: 'All Members', icon: <Users size={18} />, group: 'Members', badge: data?.pendingSignups },
     { href: '/admin/members/new', label: 'Add Member', icon: <UserPlus size={18} />, group: 'Members' },
+    { href: '/admin/manage-members', label: 'Manage Members', icon: <UserCog size={18} />, group: 'Members' },
     { href: '/admin/fees', label: 'Monthly Fees', icon: <CreditCard size={18} />, group: 'Monthly Fees' },
     { href: '/admin/payment-proofs', label: 'Payment Screenshots', icon: <ImageUp size={18} />, group: 'Monthly Fees', badge: data?.pendingProofs },
     { href: '/admin/payments', label: 'Payment History', icon: <History size={18} />, group: 'Monthly Fees' },

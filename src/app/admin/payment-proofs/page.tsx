@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Check, Eye, Search, X } from 'lucide-react';
-import { Alert, Button, Empty, ErrorState, Modal, PageHead, Pagination, PageLoader, SelectField, StatusBadge, TextArea, TextField } from '@/components/ui';
+import { Alert, Button, Empty, ErrorState, Modal, PageHead, Pagination, PageLoader, SelectField, StatusBadge, TextArea, TextField, TableSkeleton } from '@/components/ui';
 import { useToast } from '@/context/ToastContext';
 import { api, ApiError, errorMessage } from '@/lib/api';
 import { fmtDate, methodLabel, money, todayISO } from '@/lib/format';
@@ -121,7 +121,7 @@ export default function PaymentProofsPage() {
             <input type="search" placeholder="Search Gym ID, name or phone..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} aria-label="Search screenshots by member" />
           </div>
         </div>
-        {loading && !data ? <PageLoader /> : error || !data ? <ErrorState message={error ?? 'Unknown error'} onRetry={reload} /> : data.items.length === 0 ? (
+        {loading && !data ? <TableSkeleton /> : error || !data ? <ErrorState message={error ?? 'Unknown error'} onRetry={reload} /> : data.items.length === 0 ? (
           <Empty title={status === 'PENDING' ? 'Nothing waiting for review' : 'No screenshots here'}>{status === 'PENDING' ? 'New screenshots from members will appear here and in your sidebar.' : ''}</Empty>
         ) : (
           <>
